@@ -17,7 +17,7 @@ void layers::in(unsigned short num_of_layer, unsigned short activation)
 }
 
 
-NeuralNetwork::NeuralNetwork(layers m_layer) 
+NeuralNetwork::NeuralNetwork(layers &m_layer) 
     :num_layers(m_layer.layers_data), activation(m_layer.activations), layer_size(m_layer.size)
 {
     srand((unsigned int)time(NULL));
@@ -37,7 +37,7 @@ NeuralNetwork::NeuralNetwork(layers m_layer)
     }
 }
 
-std::vector<float> NeuralNetwork::predict(std::vector<float> data)
+std::vector<float> NeuralNetwork::predict(std::vector<float> &data)
 {
     std::vector<std::vector<float>> layer_data;
     // layer data di tambah input
@@ -56,7 +56,7 @@ std::vector<float> NeuralNetwork::predict(std::vector<float> data)
                 value += layer_data[i - 1][k] * weight_data[i - 1]->arr2d[j][k];
             }
             value += bias_data[i - 1]->arr2d[j][0];
-            value = getActivation(activation[i], value);
+            value = getActivation(&activation[i], &value);
             nextlayer.push_back(value);
         }
 
@@ -87,7 +87,7 @@ void NeuralNetwork::mutate(float rate)
     }
 }
 
-void NeuralNetwork::train(std::vector<std::vector<float>> xs, std::vector<std::vector<float>> ys, unsigned int ephocs) 
+void NeuralNetwork::train(std::vector<std::vector<float>> &xs, std::vector<std::vector<float>> &ys, unsigned int ephocs) 
 {
     for (unsigned int eph = 0; eph < ephocs; eph++)
     {
@@ -110,7 +110,7 @@ void NeuralNetwork::train(std::vector<std::vector<float>> xs, std::vector<std::v
                         value += layers[i - 1][k][0] * weight_data[i - 1]->arr2d[j][k];
                     }
                     value += bias_data[i - 1]->arr2d[j][0];
-                    value = getActivation(activation[i], value);
+                    value = getActivation(&activation[i], &value);
                     std::vector<float> result;
                     result.push_back(value);
                     nextlayer.push_back(result);
@@ -136,7 +136,7 @@ void NeuralNetwork::train(std::vector<std::vector<float>> xs, std::vector<std::v
                 for (std::vector<float> predict_val : predict_value)
                 {
                     std::vector<float> setOnDerivative;
-                    setOnDerivative.push_back(getDerivative(activation[b], predict_val[0]));
+                    setOnDerivative.push_back(getDerivative(&activation[b], &predict_val[0]));
                     optimizer.push_back(setOnDerivative);
                 }
 
@@ -162,45 +162,53 @@ void NeuralNetwork::train(std::vector<std::vector<float>> xs, std::vector<std::v
 }
 
 NeuralNetwork::~NeuralNetwork()
-{}
+{
+    for (short layer = 0; layer < layer_size - 1; layer++)
+    {
+        delete[] weight_data[layer];
+        delete[] bias_data[layer];
+    }
+    delete[] weight_data;
+    delete[] bias_data;
+}
 
-float NeuralNetwork::getActivation(unsigned short activation, float value)
+float NeuralNetwork::getActivation(unsigned short *activation, float *value)
 {
     float result;
-    if (activation == ACT_SIGMOID)
+    if (*activation == ACT_SIGMOID)
     {
-        result = 1 / (1 + exp(value * -1));
+        result = 1 / (1 + exp(*value * -1));
     }
-    else if (activation == ACT_TANH)
+    else if (*activation == ACT_TANH)
     {
-        result = (exp(value) - exp(value * -1)) / (exp(value) + exp(value * -1));
+        result = (exp(*value) - exp(*value * -1)) / (exp(*value) + exp(*value * -1));
     }
-    else if (activation == ACT_RELU)
+    else if (*activation == ACT_RELU)
     {
-        if(value <= 0){
+        if(*value <= 0){
             result = 0.0f;
         }else{
-            result = value;
+            result = *value;
         }
     }
     
     return result;
 }
 
-float NeuralNetwork::getDerivative(unsigned short activation, float value)
+float NeuralNetwork::getDerivative(unsigned short *activation, float *value)
 {
     float result;
-    if (activation == ACT_SIGMOID)
+    if (*activation == ACT_SIGMOID)
     {
-        result = value * (1 - value);
+        result = *value * (1 - *value);
     }
-    else if (activation == ACT_TANH)
+    else if (*activation == ACT_TANH)
     {
-        result = 1 - (value * value);
+        result = 1 - (*value * *value);
     }
-    else if (activation == ACT_RELU)
+    else if (*activation == ACT_RELU)
     {
-        if(value > 0){
+        if(*value > 0){
             result = 1.0f;
         }else{
             result = 0.0f;

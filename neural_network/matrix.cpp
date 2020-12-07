@@ -10,9 +10,7 @@ Matrix::Matrix(short rows, short cols)
     {
         std::vector<float> cols_data;
         for (short j = 0; j < cols; j++)
-        {
             cols_data.push_back(0.0f);
-        }
         arr2d.push_back(cols_data);
     }
 }
@@ -62,9 +60,8 @@ std::vector<std::vector<float>> Matrix::multiplyArray2d(std::vector<std::vector<
         std::vector<float> cols;
         for (short j = 0; j < b[0].size(); j++) {
             float sum = 0;
-            for (short k = 0; k < a[0].size(); k++) {
+            for (short k = 0; k < a[0].size(); k++) 
                 sum += a[i][k] * b[k][j];
-            }
             cols.push_back(sum);
         }
         result.push_back(cols);
@@ -89,17 +86,11 @@ std::vector<std::vector<float>> Matrix::transpose(std::vector<std::vector<float>
     float** temporary_array2d;
     temporary_array2d = new float* [array[0].size()];
     for (short i = 0; i < array[0].size(); i++)
-    {
         temporary_array2d[i] = new float[array.size()];
-    }
 
     for (int i = 0; i < array.size(); i++)
-    {
         for (int j = 0; j < array[i].size(); j++)
-        {
             temporary_array2d[j][i] = array[i][j];
-        }
-    }
 
     // temporary_array to <vector>
     std::vector<std::vector<float>> result;
@@ -112,6 +103,11 @@ std::vector<std::vector<float>> Matrix::transpose(std::vector<std::vector<float>
         }
         result.push_back(rows);
     }
+
+    // delete temporary_array2d
+    for (short i = 0; i < array[0].size(); i++)
+            delete[] temporary_array2d[i];
+    delete[] temporary_array2d;
 
     return result;
 }

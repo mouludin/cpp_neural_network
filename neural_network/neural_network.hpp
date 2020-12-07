@@ -36,19 +36,19 @@ private:
     unsigned short weight_data_length = 0;
 
 public:
-    NeuralNetwork(layers m_layer);
+    NeuralNetwork(layers &m_layer);
 
-    std::vector<float> predict(std::vector<float> data);
+    std::vector<float> predict(std::vector<float> &data);
 
     void mutate(float rate);
 
-    void train(std::vector<std::vector<float>> xs, std::vector<std::vector<float>> ys, unsigned int ephocs);
+    void train(std::vector<std::vector<float>> &xs, std::vector<std::vector<float>> &ys, unsigned int ephocs);
 
     void export_neuron(const char* filename = "neuron_data.bin");
     void import_neuron(const char* filename);
     ~NeuralNetwork();
 
 private:
-    float getActivation(unsigned short activation, float value);
-    float getDerivative(unsigned short activation, float value);
+    float getActivation(unsigned short *activation, float *value);
+    float getDerivative(unsigned short *activation, float *value);
 };

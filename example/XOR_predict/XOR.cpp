@@ -7,9 +7,9 @@ int main()
     // Make layers early
     layers MyLayers = layers(4);
     MyLayers.in(2);
-    MyLayers.in(4, ACT_RELU);
-    MyLayers.in(4, ACT_TANH);
-    MyLayers.in(1, ACT_SIGMOID);
+    MyLayers.in(4, ACT_SIGMOID);
+    MyLayers.in(4, ACT_SIGMOID);
+    MyLayers.in(1, ACT_TANH);
 
     NeuralNetwork MyNN = NeuralNetwork(MyLayers);
 
@@ -35,4 +35,6 @@ int main()
         std::cout << k << std::endl;
     for (float k : predict_value3)
         std::cout << k << std::endl;
+
+    return 0;
 }
