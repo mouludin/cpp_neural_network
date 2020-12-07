@@ -7,7 +7,7 @@ Minimalist neural network library for machine learning &amp; deep learning in C+
 
 ### Example XOR problem
 
-### Include this library and <vector> library
+### Include this library and vector library
 ```c++
   #include <vector>
 
