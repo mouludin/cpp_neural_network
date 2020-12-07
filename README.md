@@ -1,4 +1,4 @@
-# Mouludin - NeuralNetwork
+# Mouludin - C++ Neural Network
 
 Minimalist neural network library for machine learning &amp; deep learning in C++
 
