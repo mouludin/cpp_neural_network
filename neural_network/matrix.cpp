@@ -47,15 +47,15 @@ void Matrix::SetRandom() {
             arr2d[i][j] = (rand() % 100) * 0.01f;
 }
 
-void Matrix::add(std::vector<std::vector<float>> add) {
+void Matrix::add(MATRIX(float) add) {
     for (short i = 0; i < rows; i++)
         for (short j = 0; j < cols; j++)
             arr2d[i][j] = arr2d[i][j] + add[i][j];
 }
 
-std::vector<std::vector<float>> Matrix::multiplyArray2d(std::vector<std::vector<float>> a, std::vector<std::vector<float>> b)
+MATRIX(float) Matrix::multiplyMatrix(MATRIX(float) a, MATRIX(float) b)
 {
-    std::vector<std::vector<float>> result;
+    MATRIX(float) result;
     for (short i = 0; i < a.size(); i++) {
         std::vector<float> cols;
         for (short j = 0; j < b[0].size(); j++) {
@@ -69,9 +69,9 @@ std::vector<std::vector<float>> Matrix::multiplyArray2d(std::vector<std::vector<
     return result;
 }
 
-std::vector<std::vector<float>> Matrix::array2d(std::vector<float> array)
+MATRIX(float) Matrix::tomatrix(std::vector<float> array)
 {
-    std::vector<std::vector<float>> result;
+    MATRIX(float) result;
     for (short i = 0; i < array.size(); i++)
     {
         std::vector<float> rows;
@@ -81,7 +81,7 @@ std::vector<std::vector<float>> Matrix::array2d(std::vector<float> array)
     return result;
 }
 
-std::vector<std::vector<float>> Matrix::transpose(std::vector<std::vector<float>> array)
+MATRIX(float) Matrix::transpose(MATRIX(float) array)
 {
     float** temporary_array2d;
     temporary_array2d = new float* [array[0].size()];
@@ -93,7 +93,7 @@ std::vector<std::vector<float>> Matrix::transpose(std::vector<std::vector<float>
             temporary_array2d[j][i] = array[i][j];
 
     // temporary_array to <vector>
-    std::vector<std::vector<float>> result;
+    MATRIX(float) result;
     for (short i = 0; i < array[0].size(); i++)
     {
         std::vector<float> rows;

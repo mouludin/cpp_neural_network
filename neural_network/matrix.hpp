@@ -1,16 +1,18 @@
 // My own matrix library for neural network
-
 #pragma once
 
 #include <cstdlib>
 #include <vector>
+
+// Datatype
+#define MATRIX(X) std::vector<std::vector<X>>
 
 class Matrix
 {
 public:
     short rows;
     short cols;
-    std::vector<std::vector<float>> arr2d;
+    MATRIX(float) arr2d;
 
 public:
     Matrix(short rows, short cols);
@@ -23,9 +25,9 @@ public:
 
     void SetRandom();
 
-    void add(std::vector<std::vector<float>> add);
+    void add(MATRIX(float) add);
 
-    static std::vector<std::vector<float>> multiplyArray2d(std::vector<std::vector<float>> a, std::vector<std::vector<float>> b);
-    static std::vector<std::vector<float>> array2d(std::vector<float> array);
-    static std::vector<std::vector<float>> transpose(std::vector<std::vector<float>> array);
+    static MATRIX(float) multiplyMatrix(MATRIX(float) a, MATRIX(float) b);
+    static MATRIX(float) tomatrix(std::vector<float> array);
+    static MATRIX(float) transpose(MATRIX(float) array);
 };

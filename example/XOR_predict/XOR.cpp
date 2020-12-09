@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "../../neural_network/neural_network.hpp"
 
@@ -14,8 +15,8 @@ int main()
     NeuralNetwork MyNN = NeuralNetwork(MyLayers);
 
     // Datasets
-    std::vector<std::vector<float>> xs = { {1,0},{0,1},{0,0},{1,1} };
-    std::vector<std::vector<float>> ys = { {1},{1},{0},{0} };
+    MATRIX(float) xs = { {1,0},{0,1},{0,0},{1,1} };
+    MATRIX(float) ys = { {1},{1},{0},{0} };
 
     // Training data or Calculate error
     MyNN.train(xs, ys, 10000);

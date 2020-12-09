@@ -17,7 +17,7 @@ void layers::in(unsigned short num_of_layer, unsigned short activation)
 }
 
 
-NeuralNetwork::NeuralNetwork(layers &m_layer) 
+NeuralNetwork::NeuralNetwork(layers& m_layer) 
     :num_layers(m_layer.layers_data), activation(m_layer.activations), layer_size(m_layer.size)
 {
     srand((unsigned int)time(NULL));
@@ -37,9 +37,9 @@ NeuralNetwork::NeuralNetwork(layers &m_layer)
     }
 }
 
-std::vector<float> NeuralNetwork::predict(std::vector<float> &data)
+std::vector<float> NeuralNetwork::predict(std::vector<float>& data)
 {
-    std::vector<std::vector<float>> layer_data;
+    MATRIX(float) layer_data;
     // layer data di tambah input
     layer_data.push_back(data);
     for (unsigned short i = 1; i < num_layers.size(); i++)
@@ -56,7 +56,7 @@ std::vector<float> NeuralNetwork::predict(std::vector<float> &data)
                 value += layer_data[i - 1][k] * weight_data[i - 1]->arr2d[j][k];
             }
             value += bias_data[i - 1]->arr2d[j][0];
-            value = getActivation(&activation[i], &value);
+            value = getActivation(activation[i], value);
             nextlayer.push_back(value);
         }
 
@@ -87,19 +87,19 @@ void NeuralNetwork::mutate(float rate)
     }
 }
 
-void NeuralNetwork::train(std::vector<std::vector<float>> &xs, std::vector<std::vector<float>> &ys, unsigned int ephocs) 
+void NeuralNetwork::train(MATRIX(float)& xs, MATRIX(float)& ys, unsigned int ephocs) 
 {
     for (unsigned int eph = 0; eph < ephocs; eph++)
     {
         for (unsigned short x = 0; x < xs.size(); x++)
         {
             // layer data di tambah input
-            std::vector<std::vector<std::vector<float>>> layers;
-            layers.push_back(Matrix::array2d(xs[x]));
+            std::vector<MATRIX(float)> layers;
+            layers.push_back(Matrix::tomatrix(xs[x]));
             for (unsigned short i = 1; i < num_layers.size(); i++)
             {
                 // membuat layer selanjutnya
-                std::vector<std::vector<float>> nextlayer;
+                MATRIX(float) nextlayer;
 
                 // mengisi hasil layer selanjutnya
                 for (unsigned short j = 0; j < num_layers[i]; j++)
@@ -110,7 +110,7 @@ void NeuralNetwork::train(std::vector<std::vector<float>> &xs, std::vector<std::
                         value += layers[i - 1][k][0] * weight_data[i - 1]->arr2d[j][k];
                     }
                     value += bias_data[i - 1]->arr2d[j][0];
-                    value = getActivation(&activation[i], &value);
+                    value = getActivation(activation[i], value);
                     std::vector<float> result;
                     result.push_back(value);
                     nextlayer.push_back(result);
@@ -120,8 +120,8 @@ void NeuralNetwork::train(std::vector<std::vector<float>> &xs, std::vector<std::
                 layers.push_back(nextlayer);
             }
 
-            std::vector<std::vector<float>> predict_value = layers.back();
-            std::vector<std::vector<float>> loss;
+            MATRIX(float) predict_value = layers.back();
+            MATRIX(float) loss;
             for (unsigned short i = 0; i < predict_value.size(); i++)
             {
                 std::vector<float> l;
@@ -132,11 +132,11 @@ void NeuralNetwork::train(std::vector<std::vector<float>> &xs, std::vector<std::
             // backpropagation
             for (short b = weight_data_length - 1; b >= 0; --b)
             {
-                std::vector<std::vector<float>> optimizer;
+                MATRIX(float) optimizer;
                 for (std::vector<float> predict_val : predict_value)
                 {
                     std::vector<float> setOnDerivative;
-                    setOnDerivative.push_back(getDerivative(&activation[b], &predict_val[0]));
+                    setOnDerivative.push_back(getDerivative(activation[b], predict_val[0]));
                     optimizer.push_back(setOnDerivative);
                 }
 
@@ -145,14 +145,14 @@ void NeuralNetwork::train(std::vector<std::vector<float>> &xs, std::vector<std::
                     optimizer[i][0] *= loss[i][0] * learning_rate;
                 }
 
-                std::vector<std::vector<float>> layer_T = Matrix::transpose(layers[b]);
-                std::vector<std::vector<float>> w_layers_deltas = Matrix::multiplyArray2d(optimizer, layer_T);
+                MATRIX(float) layer_T = Matrix::transpose(layers[b]);
+                MATRIX(float) w_layers_deltas = Matrix::multiplyMatrix(optimizer, layer_T);
 
                 weight_data[b]->add(w_layers_deltas);
                 bias_data[b]->add(optimizer);
 
-                std::vector<std::vector<float>> weight_T = Matrix::transpose(weight_data[b]->arr2d);
-                std::vector<std::vector<float>> layer_error = Matrix::multiplyArray2d(weight_T, loss);
+                MATRIX(float) weight_T = Matrix::transpose(weight_data[b]->arr2d);
+                MATRIX(float) layer_error = Matrix::multiplyMatrix(weight_T, loss);
 
                 predict_value = layers[b];
                 loss = layer_error;
@@ -172,43 +172,43 @@ NeuralNetwork::~NeuralNetwork()
     delete[] bias_data;
 }
 
-float NeuralNetwork::getActivation(unsigned short *activation, float *value)
+float NeuralNetwork::getActivation(unsigned short& activation, float& value) const
 {
     float result;
-    if (*activation == ACT_SIGMOID)
+    if (activation == ACT_SIGMOID)
     {
-        result = 1 / (1 + exp(*value * -1));
+        result = 1 / (1 + exp(value * -1));
     }
-    else if (*activation == ACT_TANH)
+    else if (activation == ACT_TANH)
     {
-        result = (exp(*value) - exp(*value * -1)) / (exp(*value) + exp(*value * -1));
+        result = (exp(value) - exp(value * -1)) / (exp(value) + exp(value * -1));
     }
-    else if (*activation == ACT_RELU)
+    else if (activation == ACT_RELU)
     {
-        if(*value <= 0){
+        if(value <= 0){
             result = 0.0f;
         }else{
-            result = *value;
+            result = value;
         }
     }
     
     return result;
 }
 
-float NeuralNetwork::getDerivative(unsigned short *activation, float *value)
+float NeuralNetwork::getDerivative(unsigned short& activation, float& value) const
 {
     float result;
-    if (*activation == ACT_SIGMOID)
+    if (activation == ACT_SIGMOID)
     {
-        result = *value * (1 - *value);
+        result = value * (1 - value);
     }
-    else if (*activation == ACT_TANH)
+    else if (activation == ACT_TANH)
     {
-        result = 1 - (*value * *value);
+        result = 1 - (value * value);
     }
-    else if (*activation == ACT_RELU)
+    else if (activation == ACT_RELU)
     {
-        if(*value > 0){
+        if(value > 0){
             result = 1.0f;
         }else{
             result = 0.0f;
