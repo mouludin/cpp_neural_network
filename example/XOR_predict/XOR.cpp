@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <string>
 
@@ -11,15 +12,18 @@ int main()
     MyLayers.in(4, ACT_SIGMOID);
     MyLayers.in(4, ACT_SIGMOID);
     MyLayers.in(1, ACT_TANH);
-
     NeuralNetwork MyNN = NeuralNetwork(MyLayers);
 
     // Datasets
     MATRIX(float) xs = { {1,0},{0,1},{0,0},{1,1} };
     MATRIX(float) ys = { {1},{1},{0},{0} };
 
-    // Training data or Calculate error
-    MyNN.train(xs, ys, 10000);
+    Datasets datasets("example/XOR_predict/XOR.csv");
+    MyNN.train(datasets, {"x","y"},{"output"}, 10000);
+
+
+    // Training data without csv file
+    // MyNN.train(xs, ys, 10000);
 
     // Predict data
     std::vector<float> predict_value0 = MyNN.predict(xs[0]);

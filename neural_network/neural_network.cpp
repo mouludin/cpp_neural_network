@@ -1,6 +1,3 @@
-#include <cmath>
-#include <ctime>
-#include <fstream>
 #include "neural_network.hpp"
 
 layers::layers(unsigned short size)
@@ -14,6 +11,64 @@ void layers::in(unsigned short num_of_layer, unsigned short activation)
         activations.push_back(activation);
         remaining_empty_layers -= 1;
     }
+}
+
+Datasets::Datasets(const char* filename)
+{
+    // Reads a CSV file into a vector of <string, vector<int>> pairs where
+    // each pair represents <column name, column values>
+
+
+    // Create an input filestream
+    std::ifstream myFile(filename);
+
+    // Make sure the file is open
+    if(!myFile.is_open()) throw std::runtime_error("Could not open file");
+
+    // Helper vars
+    std::string line, colname;
+    int val;
+
+    // Read the column names
+    if(myFile.good())
+    {
+        // Extract the first line in the file
+        std::getline(myFile, line);
+
+        // Create a stringstream from line
+        std::stringstream ss(line);
+
+        // Extract each column name
+        while(std::getline(ss, colname, ',')){
+            // Initialize and add <colname, int vector> pairs to m_data
+            m_data.push_back({colname, std::vector<float> {}});
+        }
+    }
+
+    // Read data, line by line
+    while(std::getline(myFile, line))
+    {
+        // Create a stringstream of the current line
+        std::stringstream ss(line);
+        
+        // Keep track of the current column index
+        int colIdx = 0;
+        
+        // Extract each integer
+        while(ss >> val){
+            // Add the current integer to the 'colIdx' column's values vector
+            m_data[colIdx].second.push_back((float)val);
+
+            // If the next token is a comma, ignore it and move on
+            if(ss.peek() == ',') ss.ignore();
+            
+            // Increment the column index
+            colIdx++;
+        }
+    }
+
+    // Close file
+    myFile.close();
 }
 
 
@@ -159,6 +214,40 @@ void NeuralNetwork::train(MATRIX(float)& xs, MATRIX(float)& ys, unsigned int eph
             }
         }
     }
+}
+
+void NeuralNetwork::train(Datasets datasets,std::vector<std::string> colname_input,std::vector<std::string> colname_output, unsigned int ephocs)
+{
+    MATRIX(float) xs;
+    MATRIX(float) ys;
+    // train(xs,ys,ephocs);
+    for(short i = 0;i < colname_input.size();i++)
+    {
+        for(short j = 0;j < datasets.m_data.size();j++){
+            if(datasets.m_data[j].first == colname_input[i]){
+                for(short val = 0;val < datasets.m_data.at(j).second.size();val++)
+                {
+                    if(i == 0) xs.push_back(std::vector<float> {datasets.m_data.at(j).second[val]});
+                    else xs[val].push_back(datasets.m_data.at(j).second[val]);
+                }
+            }
+        }
+    }
+
+    for(short i = 0;i < colname_output.size();i++)
+    {
+        for(short j = 0;j < datasets.m_data.size();j++){
+            if(datasets.m_data[j].first == colname_output[i]){
+                for(short val = 0;val < datasets.m_data.at(j).second.size();val++)
+                {
+                    if(i == 0) ys.push_back(std::vector<float> {datasets.m_data[j].second[val]});
+                    else ys[val].push_back(datasets.m_data.at(j).second[val]);
+                }
+            }
+        }
+    }
+
+    train(xs,ys,ephocs);
 }
 
 NeuralNetwork::~NeuralNetwork()

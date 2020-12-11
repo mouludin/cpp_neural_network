@@ -1,4 +1,12 @@
 #pragma once
+#include <cmath>
+#include <ctime>
+#include <fstream>
+#include <utility> // std::pair
+#include <stdexcept> // std::runtime_error
+#include <sstream> // std::stringstream
+#include <iostream>
+
 
 // activation function
 #define ACT_SIGMOID 1
@@ -23,6 +31,15 @@ public:
     void in(unsigned short num_of_layer, unsigned short activation = ACT_SIGMOID);
 };
 
+class Datasets
+{
+public:
+    std::vector<std::pair<std::string, std::vector<float>>> m_data;
+
+public:
+    Datasets(const char* filename);
+};
+
 class NeuralNetwork
 {
 private:
@@ -42,6 +59,7 @@ public:
     void mutate(float rate);
 
     void train(MATRIX(float)& xs, MATRIX(float)& ys, unsigned int ephocs);
+    void train(Datasets datasets,std::vector<std::string> colname_input,std::vector<std::string> colname_output, unsigned int ephocs);
 
     void export_neuron(const char* filename = "neuron_data.bin");
     void import_neuron(const char* filename);
