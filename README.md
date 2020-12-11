@@ -79,6 +79,8 @@ Note: the greater the number of epohcs. the smaller errors you get
 0.00491454
 ```
 
+*Note: Help me improve this library.
+
 ## that is a simple example of using this library
 
 
